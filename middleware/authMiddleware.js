@@ -2,27 +2,32 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { JWT_SECRET } = require('../utils/config');
 
-const protect = async (req, res, next) => {
-  let token;
+const requireAuth = async (req, res, next) => {
+  // verify user is authenticated
+  const { authorization } = req.headers;
 
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    try {
-      token = req.headers.authorization.split(' ')[1];
-
-      const decoded = jwt.verify(token, JWT_SECRET);
-
-      req.user = await User.findById(decoded.id).select('-password');
-
-      next();
-    } catch (error) {
-      console.error(error);
-      res.status(401).json({ message: 'Not authorized, token failed' });
-    }
+  if (!authorization) {
+    return res.status(401).json({ error: 'Authorization token required' });
   }
 
-  if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+  const token = authorization.split(' ')[1];
+
+  try {
+    const { id } = jwt.verify(token, JWT_SECRET);
+
+    req.user = await User.findOne({ _id: id }).select('_id');
+    next();
+  } catch (error) {
+    // console.log(error);
+    res.status(401).json({ error: 'Request is not authorized' });
   }
 };
 
-module.exports = { protect };
+const getAuthUser = async (authorization) => {
+  const token = authorization.split(' ')[1];
+  const { id } = jwt.verify(token, JWT_SECRET);
+  const user = await User.findOne({ _id: id });
+  return { user, token };
+};
+
+module.exports = { requireAuth, getAuthUser };

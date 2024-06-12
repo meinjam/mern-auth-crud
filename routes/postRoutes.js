@@ -1,8 +1,8 @@
 const express = require('express');
 const { getPosts, createPost } = require('../controllers/postController');
-const { protect } = require('../middleware/authMiddleware');
+const { requireAuth } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.route('/').get(protect, getPosts).post(protect, createPost);
+router.route('/').get(requireAuth, getPosts).post(requireAuth, createPost);
 
 module.exports = router;

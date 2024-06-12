@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const createToken = require('../utils/generateToken');
+const { getAuthUser } = require('../middleware/authMiddleware');
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -31,4 +32,10 @@ const signupUser = async function (req, res) {
   }
 };
 
-module.exports = { loginUser, signupUser };
+const authUser = async (req, res) => {
+  const { authorization } = req.headers;
+  const { user, token } = await getAuthUser(authorization);
+  res.status(200).json({ user, token });
+};
+
+module.exports = { loginUser, signupUser, authUser };
