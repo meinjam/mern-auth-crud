@@ -1,25 +1,22 @@
 const mongoose = require('mongoose');
 
-const PostSchema = new mongoose.Schema(
+const CommentSchema = new mongoose.Schema(
   {
-    title: {
+    text: {
       type: String,
       required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    comments: [
+    post: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post',
+      required: true,
+    },
+    replies: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment',
@@ -29,7 +26,7 @@ const PostSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-PostSchema.set('toJSON', {
+CommentSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
@@ -38,4 +35,4 @@ PostSchema.set('toJSON', {
   },
 });
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.model('Comment', CommentSchema);
