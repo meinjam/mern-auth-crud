@@ -24,11 +24,4 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
-const getAuthUser = async (authorization) => {
-  const token = authorization.split(' ')[1];
-  const { id } = jwt.verify(token, JWT_SECRET);
-  const user = await User.findOne({ _id: id });
-  return { user, token };
-};
-
-module.exports = { requireAuth, getAuthUser };
+module.exports = { requireAuth };
